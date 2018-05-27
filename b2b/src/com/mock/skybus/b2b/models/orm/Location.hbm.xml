@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<!-- Generated Jun 4, 2015 4:17:55 PM by Hibernate Tools 4.3.1 -->
+<hibernate-mapping>
+    <class name="com.mock.skybus.b2b.models.orm.Location" table="location" catalog="skynet" optimistic-lock="version">
+        <id name="id" type="int">
+            <column name="id" />
+            <generator class="assigned" />
+        </id>
+        <property name="state" type="string">
+            <column name="state" length="45" not-null="true" />
+        </property>
+        <property name="city" type="string">
+            <column name="city" length="45" not-null="true" />
+        </property>
+        <set name="flightsForOrigin" table="flight" inverse="true" lazy="false" fetch="select">
+            <key>
+                <column name="origin" not-null="true" />
+            </key>
+            <one-to-many class="com.mock.skybus.b2b.models.orm.Flight" />
+        </set>
+        <set name="flightsForDestination" table="flight" inverse="true" lazy="false" fetch="select">
+            <key>
+                <column name="destination" not-null="true" />
+            </key>
+            <one-to-many class="com.mock.skybus.b2b.models.orm.Flight" />
+        </set>
+    </class>
+</hibernate-mapping>

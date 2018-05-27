@@ -1,0 +1,114 @@
+
+<!DOCTYPE html>
+<html xmlns="http://www.w3c.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<h:head>
+
+</h:head>
+<h:body style="background-color: rgb(0, 100, 70)">
+
+	<ui:insert name="head">
+		<ui:include src="/templates/header.xhtml" />
+	</ui:insert>
+
+	<h:form>
+		<p:panelGrid>
+			<p:commandButton value="Set Origin"
+				icon="ui-icon-arrowreturnthick-1-n"
+				action="#{travelBean.setOrigin()}" update="originSelection" />
+
+			<p:commandButton value="Set Destination"
+				icon="ui-icon-arrowreturnthick-1-s"
+				action="#{travelBean.setDestination()}"
+				update="destinationSelection" />
+
+			<p:commandButton value="Search" icon="ui-icon-search"
+				action="#{travelBean.search()}" update="pathsUI">
+			</p:commandButton>
+
+			<h:outputText id="originSelection"
+				value="Origin: #{travelBean.origin.city} #{travelBean.origin.state} " />
+			<h:outputText id="destinationSelection"
+				value=" Destination: #{travelBean.destination.city} #{travelBean.destination.state}" />
+
+
+			<div style="float: right">
+				<p:commandButton value="Book" icon="ui-icon-suitcase"
+					action="#{travelBean.book()}" update="pathsUI">
+				</p:commandButton>
+			</div>
+		</p:panelGrid>
+
+		<p:layout style="height: 90vh;">
+			<p:layoutUnit position="west" size="280" >
+				<p:dataTable value="#{travelBean.locations}" var="locale"
+					selectionMode="single" selection="#{travelBean.location}"
+					rowKey="#{locale.id}">
+
+					<p:column headerText="City">
+						<h:outputText value="#{locale.city}"></h:outputText>
+					</p:column>
+					<p:column headerText="State">
+						<h:outputText value="#{locale.state}"></h:outputText>
+					</p:column>
+
+				</p:dataTable>
+			</p:layoutUnit>
+			<p:layoutUnit position="center">
+
+				<p:dataTable id="pathsUI" value="#{travelBean.paths}" var="path"
+					selectionMode="single" selection="#{travelBean.path}"
+					rowKey="#{path.distance}">
+
+					<p:column style="width:20px;" headerText="d" sortBy="#{path.distance}">
+						<h:outputText value="#{path.distance}"></h:outputText>
+					</p:column>
+
+					<p:column headerText="Travel Plan">
+						<p:dataTable value="#{path.list}"
+							var="flight" rowKey="#{flight.id}">
+
+							<p:column headerText="flights">
+								<h:outputText value="flight:#{flight.id}" />
+							</p:column>
+							<p:column headerText="Origin">
+								<h:outputText value="#{flight.locationByOrigin.city}" />
+							</p:column>
+							<p:column >
+								<h:outputText value="#{flight.locationByOrigin.state}" />
+							</p:column>
+							<p:column headerText="Destination">
+								<h:outputText value="#{flight.locationByDestination.city}" />
+							</p:column>
+							<p:column>
+								<h:outputText value="#{flight.locationByDestination.state}" />
+							</p:column>
+							<p:column headerText="eta">
+								<h:outputText value="#{flight.eta + flight.departure} days" />
+							</p:column>
+							<p:column headerText="departure">
+								<h:outputText value="#{flight.departure} days" />
+							</p:column>
+							<p:column headerText="Status">
+								<h:outputText
+									value="#{flight.arrived ? 'Arrived' : 'Operating'} #{flight.postponed ? 'Delayed' : 'On Time'}" />
+							</p:column>
+							<p:column headerText="passengers">
+								<h:outputText value="#{flight.seats}" />
+							</p:column>
+						</p:dataTable>
+
+					</p:column>
+				</p:dataTable>
+		</p:layoutUnit>
+		</p:layout>
+	</h:form>
+</h:body>
+</html>
+
+
+

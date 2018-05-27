@@ -1,0 +1,139 @@
+
+<!DOCTYPE html>
+<html xmlns="http://www.w3c.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<h:head>
+
+</h:head>
+<h:body style="background-color: rgb(0, 100, 70)">
+
+	<ui:insert name="head">
+		<ui:include src="/templates/header.xhtml" />
+	</ui:insert>
+
+	<h:form>
+		<p:panelGrid>
+			<p:commandButton value="Cancel" icon="ui-icon-close"
+				action="#{scheduleBean.cancel()}" update="tripsUI">
+			</p:commandButton>
+
+			<p:commandButton value="Reroute" icon="ui-icon-shuffle"
+				action="#{scheduleBean.reroute()}" update="tripsUI pathsUI">
+			</p:commandButton>
+
+			<div style="float: right">
+				<p:commandButton value="Book" icon="ui-icon-suitcase"
+					action="#{scheduleBean.book()}" update="tripsUI pathsUI">
+				</p:commandButton>
+			</div>
+		</p:panelGrid>
+
+		<p:layout style="height: 90vh;">
+			<p:layoutUnit position="center">
+			<p:panelGrid>
+			
+			<p:column>
+			<p:dataTable id="tripsUI" value="#{scheduleBean.trips}" var="trip"
+					selectionMode="single" selection="#{scheduleBean.trip}"
+					rowKey="#{trip.distance}">
+
+					<p:column style="width:20px;" headerText="Id" sortBy="#{trip.distance}">
+						<h:outputText value="#{trip.distance}"></h:outputText>
+					</p:column>
+
+					<p:column headerText="Booked Flights">
+						<p:dataTable value="#{trip.list}"
+							var="flight" rowKey="#{flight.id}">
+
+							<p:column headerText="flights">
+								<h:outputText value="flight:#{flight.id}" />
+							</p:column>
+							<p:column headerText="origin city">
+								<h:outputText value="#{flight.locationByOrigin.city}" />
+							</p:column>
+							<p:column headerText="state">
+								<h:outputText value="#{flight.locationByOrigin.state}" />
+							</p:column>
+							<p:column headerText="destination city">
+								<h:outputText value="#{flight.locationByDestination.city}" />
+							</p:column>
+							<p:column headerText="destination city">
+								<h:outputText value="#{flight.locationByDestination.state}" />
+							</p:column>
+							<p:column headerText="eta">
+								<h:outputText value="#{flight.eta + flight.departure} days" />
+							</p:column>
+							<p:column headerText="departure">
+								<h:outputText value="#{flight.departure} days" />
+							</p:column>
+							<p:column headerText="Status">
+								<h:outputText
+									value="#{flight.arrived ? 'Arrived' : 'Operating'} #{flight.postponed ? 'Delayed' : 'On Time'}" />
+							</p:column>
+							<p:column headerText="passengers">
+								<h:outputText value="#{flight.seats}" />
+							</p:column>
+						</p:dataTable>
+
+					</p:column>
+				</p:dataTable>
+			
+			</p:column>
+			<p:column>
+
+				<p:dataTable id="pathsUI" value="#{scheduleBean.paths}" var="path"
+					selectionMode="single" selection="#{scheduleBean.path}"
+					rowKey="#{path.distance}">
+
+					<p:column style="width:20px;" headerText="d" sortBy="#{path.distance}">
+						<h:outputText value="#{path.distance}"></h:outputText>
+					</p:column>
+
+					<p:column headerText="Travel Plan">
+						<p:dataTable value="#{path.list}"
+							var="flight" rowKey="#{flight.id}">
+
+							<p:column headerText="flights">
+								<h:outputText value="flight:#{flight.id}" />
+							</p:column>
+							<p:column headerText="origin city">
+								<h:outputText value="#{flight.locationByOrigin.city}" />
+							</p:column>
+							<p:column headerText="state">
+								<h:outputText value="#{flight.locationByOrigin.state}" />
+							</p:column>
+							<p:column headerText="destination city">
+								<h:outputText value="#{flight.locationByDestination.city}" />
+							</p:column>
+							<p:column headerText="destination city">
+								<h:outputText value="#{flight.locationByDestination.state}" />
+							</p:column>
+							<p:column headerText="eta">
+								<h:outputText value="#{flight.eta + flight.departure} days" />
+							</p:column>
+							<p:column headerText="departure">
+								<h:outputText value="#{flight.departure} days" />
+							</p:column>
+							<p:column headerText="Status">
+								<h:outputText
+									value="#{flight.arrived ? 'Arrived' : 'Operating'} #{flight.postponed ? 'Delayed' : 'On Time'}" />
+							</p:column>
+							<p:column headerText="passengers">
+								<h:outputText value="#{flight.seats}" />
+							</p:column>
+						</p:dataTable>
+					</p:column>
+				</p:dataTable>
+				
+				</p:column>
+				</p:panelGrid>
+		</p:layoutUnit>
+		</p:layout>
+	</h:form>
+</h:body>
+</html>
+

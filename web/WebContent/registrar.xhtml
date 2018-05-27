@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3c.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<h:head>
+</h:head>
+<h:body style="background-color: rgb(0, 100, 70)">
+
+
+	<ui:insert name="head">
+		<ui:include src="/templates/header.xhtml" />
+	</ui:insert>
+	<h:form>
+		<p:panelGrid columns="3" id="userGrid">
+			<h:outputLabel for="name" value="User Name: *" />
+			<p:inputText id="name" value="#{registerBean.user.name}"
+				required="true">
+
+				<f:validator binding="#{usernameValidator}" />
+			</p:inputText>
+
+			<p:message for="name"></p:message>
+
+			<h:outputLabel for="password" value="Password: *" />
+			<p:password id="password" value="#{registerBean.user.password}"
+				required="true" />
+			<p:message for="password"></p:message>
+
+			<h:outputLabel for="firstname" value="First Name: " />
+			<p:inputText id="firstname" value="#{registerBean.person.firstName}" />
+			<p:spacer></p:spacer>
+
+			<h:outputLabel for="lastname" value="Last Name: " />
+			<p:inputText id="lastname" value="#{registerBean.person.lastName}" />
+			<p:spacer></p:spacer>
+
+			<h:outputLabel for="street" value="Street: " />
+			<p:inputText id="street" value="#{registerBean.address.street}" />
+			<p:spacer></p:spacer>
+
+			<h:outputLabel for="city" value="City: " />
+			<p:inputText id="city" value="#{registerBean.address.city}" />
+			<p:spacer></p:spacer>
+
+			<h:outputLabel for="state" value="State: " />
+			<p:inputText id="state" value="#{registerBean.address.state}" />
+			<p:spacer></p:spacer>
+
+			<h:outputLabel for="zip" value="Zip: " />
+			<p:inputText id="zip" value="#{registerBean.address.zip}" />
+			<p:spacer></p:spacer>
+
+		</p:panelGrid>
+
+		<p:commandButton action="#{registerBean.register()}" update="@form"
+			value="Save" validateClient="true" />
+	</h:form>
+</h:body>
+</html>

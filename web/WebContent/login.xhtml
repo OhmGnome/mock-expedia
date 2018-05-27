@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3c.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<h:head>
+</h:head>
+<h:body style="background-color: rgb(0, 100, 70)">
+
+
+	<ui:insert name="head">
+		<ui:include src="/templates/header.xhtml" />
+	</ui:insert>
+
+	<h:form>
+
+		<p:panel>
+			<h:outputText
+				value="Login failed. Please check your username and password."
+				rendered="#{authBean.isLoggedIn()}" />
+			<h:panelGrid columns="3">
+
+				<p:outputLabel for="username" value="Username" />
+				<p:inputText id="username" value="#{loginBean.user.name}"
+					required="true" />
+				<p:message for="username" />
+
+				<p:outputLabel for="password" value="Password" />
+				<p:password id="password" value="#{loginBean.user.password}"
+					required="true" />
+				<p:message for="password" />
+
+			</h:panelGrid>
+
+			<f:facet name="footer">
+				<p:commandButton value="Login" validateClient="true" process="@form"
+					update="@form" action="#{loginBean.login()}" />
+			</f:facet>
+		</p:panel>
+
+	</h:form>
+</h:body>
+</html>
+<!-- <ui:define name="head"> -->
+<!-- 	<ui:composition template="/templates/header.xhtml"/> -->
+<!-- </ui:define> -->

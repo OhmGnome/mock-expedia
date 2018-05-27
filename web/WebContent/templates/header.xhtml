@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head />
+<h:body>
+	<ui:composition>
+		<h:form>
+			<p:toolbar>
+				<f:facet name="left">
+					<p:commandButton action="#{homeBean.home()}" value="Home" />
+					<h:outputText rendered="#{loginBean.flightDelayed}"
+						value="Attention! Your flight has been delayed!"></h:outputText>
+				</f:facet>
+				<f:facet name="right" id="">
+					<p:panel rendered="#{authBean.isLoggedIn()}">
+						<p:outputLabel for="schedule" value="Welcome,#{authBean.username}" />
+						<p:spacer></p:spacer>
+						<p:commandButton id="schedule" value="Manage Fair"
+							action="#{scheduleBean.schedule()}" />
+						<p:commandButton value="Travel" action="#{travelBean.travel()}" />
+						<p:commandButton value="Profile" action="#{profileBean.profile()}" />
+						<p:commandButton action="#{authBean.logout()}" value="Logout" />
+					</p:panel>
+
+					<p:panel rendered="#{!authBean.isLoggedIn()}">
+						<p:commandButton action="#{loginBean.loginPage()}" value="Login" />
+						<p:commandButton action="#{registerBean.registrar()}"
+							value="Register" />
+					</p:panel>
+				</f:facet>
+			</p:toolbar>
+		</h:form>
+	</ui:composition>
+</h:body>
+</html>

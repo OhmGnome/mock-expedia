@@ -1,0 +1,58 @@
+
+<!DOCTYPE html>
+<html xmlns="http://www.w3c.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<h:head>
+
+</h:head>
+<h:body style="background-color: rgb(0, 100, 70)">
+
+	<ui:insert name="head">
+		<ui:include src="/templates/header.xhtml" />
+	</ui:insert>
+
+	<h:form>
+		<p:layout style="height: 90vh;">
+			<p:layoutUnit position="center">
+				<p:dataTable value="#{homeBean.flights}" var="flight"
+					rowKey="#{flight.id}">
+
+					<p:column headerText="flights">
+						<h:outputText value="flight:#{flight.id}" />
+					</p:column>
+					<p:column headerText="origin city">
+						<h:outputText value="#{flight.locationByOrigin.city}" />
+					</p:column>
+					<p:column headerText="state">
+						<h:outputText value="#{flight.locationByOrigin.state}" />
+					</p:column>
+					<p:column headerText="destination city">
+						<h:outputText value="#{flight.locationByDestination.city}" />
+					</p:column>
+					<p:column headerText="destination city">
+						<h:outputText value="#{flight.locationByDestination.state}" />
+					</p:column>
+					<p:column headerText="eta">
+						<h:outputText value="#{flight.eta + flight.departure} days" />
+					</p:column>
+					<p:column headerText="departure">
+						<h:outputText value="#{flight.departure} days" />
+					</p:column>
+					<p:column headerText="Status">
+						<h:outputText
+							value="#{flight.arrived ? 'Arrived' : 'Operating'} #{flight.postponed ? 'Delayed' : 'On Time'}" />
+					</p:column>
+					<p:column headerText="passengers">
+						<h:outputText value="#{flight.seats}" />
+					</p:column>
+
+				</p:dataTable>
+			</p:layoutUnit>
+		</p:layout>
+	</h:form>
+</h:body>
+</html>
+

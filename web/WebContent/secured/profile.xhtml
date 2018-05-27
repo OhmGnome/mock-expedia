@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3c.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<h:head>
+</h:head>
+<h:body style="background-color: rgb(0, 100, 70)">
+
+
+	<ui:insert name="head">
+		<ui:include src="/templates/header.xhtml" />
+	</ui:insert>
+	<h:form>
+		<h:panelGrid columns="2" id="userGrid">
+
+			<h:outputLabel for="firstname" value="First Name: " />
+			<p:inputText id="firstname" value="#{profileBean.person.firstName}" 
+			placeholder="#{profileBean.person.firstName}"/>
+			
+			<h:outputLabel for="lastname" value="Last Name: " />
+			<p:inputText id="lastname" value="#{profileBean.person.lastName}"
+			placeholder="#{profileBean.person.lastName}" />
+
+			<h:outputLabel for="street" value="Street: " />
+			<p:inputText id="street" value="#{profileBean.address.street}"
+			placeholder="#{profileBean.address.street}"  />
+
+			<h:outputLabel for="city" value="City: " />
+			<p:inputText id="city" value="#{profileBean.address.city}" 
+			placeholder="#{profileBean.address.city}" />
+
+			<h:outputLabel for="state" value="State: " />
+			<p:inputText id="state" value="#{profileBean.address.state}" 
+			placeholder="#{profileBean.address.state}" />
+
+			<h:outputLabel for="zip" value="Zip: " />
+			<p:inputText id="zip" value="#{profileBean.address.zip}" 
+			placeholder="#{profileBean.address.zip}" />
+
+		</h:panelGrid>
+
+		<p:commandButton action="#{profileBean.save()}" update="@form"
+			value="Save" validateClient="true" />
+	</h:form>
+</h:body>
+</html>

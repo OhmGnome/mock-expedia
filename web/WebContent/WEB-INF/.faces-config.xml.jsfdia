@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PROCESS model-entity="JSFProcess">
+ <PROCESS-ITEM NAME="rules:#*" PATH="/*" SHAPE="32,17,0,0" model-entity="JSFProcessGroup">
+  <PROCESS-ITEM ID="rules:#*:0" NAME="item" PATH="/*" model-entity="JSFProcessItem">
+   <PROCESS-ITEM-OUTPUT ID="travel::#secured#travel.xhtml" NAME="output"
+    PATH="/secured/travel.xhtml" TARGET="rules:#secured#travel.xhtml"
+    TITLE="travel" model-entity="JSFProcessItemOutput"/>
+   <PROCESS-ITEM-OUTPUT ID="schedule::#secured#schedule.xhtml"
+    NAME="output1" PATH="/secured/schedule.xhtml"
+    TARGET="rules:#secured#schedule.xhtml" TITLE="schedule" model-entity="JSFProcessItemOutput"/>
+   <PROCESS-ITEM-OUTPUT ID="profile::#secured#profile.xhtml"
+    NAME="output2" PATH="/secured/profile.xhtml"
+    TARGET="rules:#secured#profile.xhtml" TITLE="profile" model-entity="JSFProcessItemOutput"/>
+   <PROCESS-ITEM-OUTPUT ID="registrar::#registrar.xhtml" NAME="output3"
+    PATH="/registrar.xhtml" TARGET="rules:#registrar.xhtml"
+    TITLE="registrar" model-entity="JSFProcessItemOutput"/>
+   <PROCESS-ITEM-OUTPUT ID="login::#login.xhtml" NAME="output4"
+    PATH="/login.xhtml" TARGET="rules:#login.xhtml" TITLE="login" model-entity="JSFProcessItemOutput"/>
+  </PROCESS-ITEM>
+ </PROCESS-ITEM>
+ <PROCESS-ITEM NAME="rules:#login.xhtml" PATH="/login.xhtml"
+  SHAPE="528,401,0,0" model-entity="JSFProcessGroup"/>
+ <PROCESS-ITEM NAME="rules:#registrar.xhtml" PATH="/registrar.xhtml"
+  SHAPE="304,417,0,0" model-entity="JSFProcessGroup"/>
+ <PROCESS-ITEM NAME="rules:#home.xhtml" PATH="/home.xhtml"
+  SHAPE="304,305,0,0" model-entity="JSFProcessGroup"/>
+ <PROCESS-ITEM NAME="rules:#secured#profile.xhtml"
+  PATH="/secured/profile.xhtml" SHAPE="304,33,0,0" model-entity="JSFProcessGroup"/>
+ <PROCESS-ITEM NAME="rules:#secured#travel.xhtml"
+  PATH="/secured/travel.xhtml" SHAPE="304,273,0,0" model-entity="JSFProcessGroup"/>
+ <PROCESS-ITEM NAME="rules:#secured#schedule.xhtml"
+  PATH="/secured/schedule.xhtml" SHAPE="304,273,0,0" model-entity="JSFProcessGroup"/>
+</PROCESS>
