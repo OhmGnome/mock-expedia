@@ -1,14 +1,9 @@
 package com.mock.skybus.b2b.beans.dao.impl;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 
 import javax.transaction.Transactional;
 
@@ -227,7 +222,7 @@ public class FlightDaoImpl implements FlightDao {
 
 		log.info("entering FlightDaoImpl.mapPaths()");
 
-		List<FlightsWrapper> paths = new ArrayList<>();
+		BlockingQueue<FlightsWrapper> paths = new ArrayBlockingQueue<FlightsWrapper>(1024);
 		for (Flight flight1 : flightsFromOrigin) {
 			Integer distance = 0;
 			Integer flight1DestId = flight1.getLocationByDestination().getId();
@@ -255,7 +250,8 @@ public class FlightDaoImpl implements FlightDao {
 			* divide and conquer all the flights to find the path for up to 2 hops.
 			*/
 			} else {
-				ArrayList<PathsWorker> pathsWorkers = new ArrayList<>();
+				// ArrayList<PathsWorker> pathsWorkers = new ArrayList<>();
+				ArrayList<Thread> pathsWorkers = new ArrayList<>();
 				PathsWorker pathsWorker = new PathsWorker();
 				pathsWorker.destination = destination;
 				pathsWorker.flight1 = flight1;
@@ -274,23 +270,36 @@ public class FlightDaoImpl implements FlightDao {
 						try {
 							PathsWorker clone = (PathsWorker) pathsWorker.clone();
 							clone.paths = paths;
-							pathsWorkers.add(clone);
+							Thread t = new Thread(clone);
+							t.setName("PathsWorker" + i);
+							t.start();
+							pathsWorkers.add(t);
 						} catch (CloneNotSupportedException e) {
 							e.printStackTrace();
 						}
 					}
 				}else{
 					pathsWorker.paths = paths;
-					pathsWorkers.add(pathsWorker);
+					Thread t = new Thread(pathsWorker);
+					t.setName("PathsWorker");
+					t.start();
+					pathsWorkers.add(t);
 				}
 
-				for (PathsWorker p : pathsWorkers){
-					p.join();
+				for (Thread t : pathsWorkers){
+					try {
+						t.join();
+					} catch (InterruptedException e) {
+						log.error("InterruptedException on thread " + t.getName());
+						e.printStackTrace();
+					}
 				}
 			}
 		}
 		log.info("leaving FlightDaoImpl.mapPaths() with {} paths", paths.size());
-		return paths;
+		// return (List<FlightsWrapper>) paths;
+
+		return new ArrayList<FlightsWrapper>(paths);
 	}
 
 
@@ -299,7 +308,7 @@ public class FlightDaoImpl implements FlightDao {
 		List<Flight> flights;
 		List<Flight> flightsToDestination;
 		Location destination;
-		volatile List<FlightsWrapper> paths;
+		BlockingQueue<FlightsWrapper> paths;
 
 		Integer distance = 0;
 
