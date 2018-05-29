@@ -198,7 +198,7 @@ public class FlightDaoImpl implements FlightDao {
 	}
 
 	/**
-		 * Get a flight path from an origin location to a destination location by
+	 * Get a flight path from an origin location to a destination location by
 	 * matching one flights destination to the origin of another, using three
 	 * lists to sequentially iterate and compare locations. At every conditional
 	 * statement, when the if statement is met, a path from the origin to the
@@ -215,58 +215,135 @@ public class FlightDaoImpl implements FlightDao {
 	 * @return
 	 */
 	private List<FlightsWrapper> mapPaths(Location origin,
-			Location destination, List<Flight> flights,
-			List<Flight> flightsFromOrigin, List<Flight> flightsToDestination) {
+	Location destination, List<Flight> flights,
+	List<Flight> flightsFromOrigin, List<Flight> flightsToDestination) {
 
-		log.info("entering FlightDaoImpl.mapPaths()");
+	log.info("entering FlightDaoImpl.mapPaths()");
 
-		List<FlightsWrapper> paths = new ArrayList<>();
-		for (Flight flight1 : flightsFromOrigin) {
-			Integer distance = 0;
-			Integer flight1DestId = flight1.getLocationByDestination().getId();
+	List<FlightsWrapper> paths = new ArrayList<>();
+	for (Flight flight1 : flightsFromOrigin) {
+		Integer distance = 0;
+		Integer flight1DestId = flight1.getLocationByDestination().getId();
+
+		/*
+		* if a single flight exists form the desired origin to the desired
+		* destination
+		*/
+		if (flight1DestId == destination.getId()) {
+			List<Flight> path = new ArrayList<>();
+			path.add(flight1);
+			distance = flight1.getEta();
+
+			FlightsWrapper flightsWrapper = new FlightsWrapper();
+			flightsWrapper.setList(path);
+			flightsWrapper.setDistance(distance);
+			paths.add(flightsWrapper);
+
+			log.warn(
+					"A direct flight was found, flight number {} with distance {}",
+					flight1.getId(), distance);
+
+		
+		/*
+		* divide and conquer all the flights to find the path for up to 2 hops.
+		*/
+		} else {
+			Worker worker = new Worker();
+			worker.destination = destination;
+			worker.flight1 = flight1;
+			worker.flightsToDestination = flightsToDestination;
+
+			int size = (int) Math.floor(flights.size()/4);
+			for (int i = 0; i < 4; i++){
+				int start = size * i;
+				int end;
+				if (i != 3) end = size * (i + 1);
+				else end = flights.size() - 1;
+
+				worker.flights = flights.subList(start, end);
+				
+				try {
+					Worker clone = (Worker) worker.clone();
+					clone.paths = paths;
+					clone.run();
+				} catch (CloneNotSupportedException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+	log.info("leaving FlightDaoImpl.mapPaths() with {} paths", paths.size());
+	return paths;
+	}
+
+
+	private class Worker implements Runnable, Cloneable{
+	Flight flight1;
+	List<Flight> flights;
+	List<Flight> flightsToDestination;
+	Location destination;
+	volatile List<FlightsWrapper> paths;
+
+	Integer distance = 0;
+
+	protected Object clone() throws CloneNotSupportedException {
+		return super.clone();
+	}
+
+	@Override
+	public void run() {
+		for (Flight flight2 : flights) {
+			Integer flight2OriginId = flight2.getLocationByOrigin()
+					.getId();
+			Integer flight2DestId = flight2.getLocationByDestination()
+					.getId();
 
 			/*
-			 * if a single flight exists form the desired origin to the desired
-			 * destination
-			 */
-			if (flight1DestId == destination.getId()) {
-				List<Flight> path = new ArrayList<>();
-				path.add(flight1);
-				distance = flight1.getEta();
+			* if another flight's origin is that of the first flights
+			* destination it is circular and should be skipped
+			*/
+			if (flight2OriginId == flight1.getLocationByDestination().getId()) {
 
-				FlightsWrapper flightsWrapper = new FlightsWrapper();
-				flightsWrapper.setList(path);
-				flightsWrapper.setDistance(distance);
-				paths.add(flightsWrapper);
+				/*
+				* if the destination of flight 2 = the desired
+				* destination
+				*/
+				if (flight2DestId == destination.getId()
+						&& flight1.getEta() + flight1.getDeparture() > flight2
+								.getDeparture()) {
+					List<Flight> path = new ArrayList<>();
+					path.add(flight1);
+					path.add(flight2);
+					distance = flight1.getEta() + flight2.getEta();
 
-				log.warn(
-						"A direct flight was found, flight number {} with distance {}",
-						flight1.getId(), distance);
+					FlightsWrapper flightsWrapper = new FlightsWrapper();
+					flightsWrapper.setList(path);
+					flightsWrapper.setDistance(distance);
+					paths.add(flightsWrapper);
 
-			} else {
-				for (Flight flight2 : flights) {
-					Integer flight2OriginId = flight2.getLocationByOrigin()
-							.getId();
-					Integer flight2DestId = flight2.getLocationByDestination()
-							.getId();
+					log.warn(
+							"A flight with a layover was found, flight number {} and flight number {} with distance {}",
+							flight1.getId(), flight2.getId(), distance);
 
 					/*
-					 * if another flight's origin is that of the first flights
-					 * destination
-					 */
-					if (flight2OriginId == flight1DestId) {
-
-						/*
-						 * if the destination of flight 2 = the desired
-						 * destination
-						 */
-						if (flight2DestId == destination.getId()
-								&& flight1.getEta() + flight1.getDeparture() > flight2
-										.getDeparture()) {
+					* if the destination of flight 2 = the origin of a
+					* third flight to the desired destination
+					*/
+				} else {
+					for (Flight flight3 : flightsToDestination) {
+						Integer flight3OriginId = flight3
+								.getLocationByOrigin().getId();
+						if (flight2DestId == flight3OriginId
+								&& flight2.getEta()
+										+ flight2.getDeparture() > flight3
+											.getDeparture()) {
 							List<Flight> path = new ArrayList<>();
 							path.add(flight1);
 							path.add(flight2);
-							distance = flight1.getEta() + flight2.getEta();
+							path.add(flight3);
+							distance = flight1.getEta()
+									+ flight2.getEta()
+									+ flight3.getEta();
 
 							FlightsWrapper flightsWrapper = new FlightsWrapper();
 							flightsWrapper.setList(path);
@@ -274,48 +351,16 @@ public class FlightDaoImpl implements FlightDao {
 							paths.add(flightsWrapper);
 
 							log.warn(
-									"A flight with a layover was found, flight number {} and flight number {} with distance {}",
-									flight1.getId(), flight2.getId(), distance);
-
-							/*
-							 * if the destination of flight 2 = the origin of a
-							 * third flight to the desired destination
-							 */
-						} else {
-							for (Flight flight3 : flightsToDestination) {
-								Integer flight3OriginId = flight3
-										.getLocationByOrigin().getId();
-								if (flight2DestId == flight3OriginId
-										&& flight2.getEta()
-												+ flight2.getDeparture() > flight3
-													.getDeparture()) {
-									List<Flight> path = new ArrayList<>();
-									path.add(flight1);
-									path.add(flight2);
-									path.add(flight3);
-									distance = flight1.getEta()
-											+ flight2.getEta()
-											+ flight3.getEta();
-
-									FlightsWrapper flightsWrapper = new FlightsWrapper();
-									flightsWrapper.setList(path);
-									flightsWrapper.setDistance(distance);
-									paths.add(flightsWrapper);
-
-									log.warn(
-											"A flight with a layover was found, flight number {} and flight number {} and flight number {} with distance {} ",
-											flight1.getId(), flight2.getId(),
-											flight3.getId(), distance);
-								}
-							}
+									"A flight with a layover was found, flight number {} and flight number {} and flight number {} with distance {} ",
+									flight1.getId(), flight2.getId(),
+									flight3.getId(), distance);
 						}
 					}
 				}
 			}
 		}
-		log.info("leaving FlightDaoImpl.mapPaths() with {} paths", paths.size());
-		return paths;
 	}
+}
 
 	/**
 	 * reroutes a travel plan (a list of flights). Gets a list of flights whos
